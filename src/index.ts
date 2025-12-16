@@ -14,6 +14,13 @@ async function init() {
     const result = await db();
     console.log(`database status: ${result}`);
 
+    app.get("/", (req, res) => {
+      res.json({
+        message: "Server is running",
+        data: null
+      })
+    })
+
     app.use(bodyParser.json());
     app.use("/api", router);
 
