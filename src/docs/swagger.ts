@@ -24,11 +24,21 @@ const doc = {
       },
     },
     schemas: {
-        LoginRequest: {
-            identifier: "lirhza",
-            password: "12345678"
-        }
-    }
+      LoginRequest: {
+        identifier: "lirhza",
+        password: "12345678",
+      },
+      RegisterRequest: {
+        fullName: "lirhza lirhza",
+        username: "lirhza2025",
+        email: "lirhza@yopmail.com",
+        password: "12345678",
+        confirmPassword: "12345678",
+      },
+      ActivationRequest: {
+        code: "abcdef"
+      }
+    },
   },
 };
 

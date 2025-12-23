@@ -22,7 +22,22 @@ const registerValidateSchema = Yup.object({
   fullname: Yup.string().required(),
   username: Yup.string().required(),
   email: Yup.string().email().required(),
-  password: Yup.string().required(),
+  password: Yup.string()
+    .required()
+    .min(6, "Password must be at least 6 characters")
+    .test(
+      'at-least-one-uppercase-letter, "Contains at least one uppercase letter',
+      (value) => {
+        if (!value) return false;
+        const regex = /^(?=.*[A-Z])/;
+        return regex.test(value);
+      }
+    )
+    .test('at-least-one-number, "Contains at least one Number', (value) => {
+      if (!value) return false;
+      const regex = /^(?=.*\d)/;
+      return regex.test(value);
+    }),
   confirmPassword: Yup.string()
     .required()
     .oneOf([Yup.ref("password"), ""], "Password not matched"),
@@ -87,6 +102,7 @@ export default {
             username: identifier,
           },
         ],
+        isActive: true,
       });
 
       if (!userByIdentifier) {
@@ -141,6 +157,45 @@ export default {
         data: result,
       });
       ``;
+    } catch (error) {
+      const err = error as unknown as Error;
+      res.status(400).json({
+        message: err.message,
+        data: null,
+      });
+    }
+  },
+
+  async activationCode(req: Request, res: Response) {
+    try {
+      /**
+        #swagger.tags = ['Auth']
+        #swagger.requestBody = {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: '#/components/schemas/ActivationRequest' }
+            }
+          }
+        }
+      */
+
+      const { code } = req.body as { code: string };
+      const user = await UserModel.findOneAndUpdate(
+        {
+          activationCode: code,
+        },
+        {
+          isActive: true,
+        },
+        {
+          new: true,
+        }
+      );
+      res.status(200).json({
+        message: "Users successfuly activated",
+        data: user,
+      });
     } catch (error) {
       const err = error as unknown as Error;
       res.status(400).json({

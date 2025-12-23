@@ -1,4 +1,4 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
 import { encrypt } from "../utils/encryption";
 import { sendEmail, renderMailHTML } from "../utils/mail/mail";
 
@@ -25,10 +25,12 @@ const UsersSchema = new Schema<Users>(
     username: {
       type: Schema.Types.String,
       required: true,
+      unique: true,
     },
     email: {
       type: Schema.Types.String,
       required: true,
+      unique: true,
     },
     password: {
       type: Schema.Types.String,
@@ -58,6 +60,7 @@ const UsersSchema = new Schema<Users>(
 
 UsersSchema.pre("save", async function () {
   this.password = encrypt(this.password);
+  this.activationCode = encrypt(this.id);
 });
 
 UsersSchema.post("save", async function (doc, next) {
