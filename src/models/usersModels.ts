@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { encrypt } from "../utils/encryption";
 import { sendEmail, renderMailHTML } from "../utils/mail/mail";
+import { ROLES } from "../utils/constant";
 
 export interface Users {
   fullname: string;
@@ -38,8 +39,8 @@ const UsersSchema = new Schema<Users>(
     },
     role: {
       type: Schema.Types.String,
-      enum: ["admin", "users"],
-      default: "users",
+      enum: [ROLES.ADMIN, ROLES.MEMBER],
+      default: ROLES.MEMBER,
     },
     profilePicture: {
       type: Schema.Types.String,
