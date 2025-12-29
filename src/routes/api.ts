@@ -38,5 +38,16 @@ router.post(
   aclMiddleware([ROLES.ADMIN, ROLES.MEMBER]),
   categoryController.create
 );
+router.get(
+  "/all/category",
+  authMiddleware,
+  aclMiddleware([ROLES.ADMIN, ROLES.MEMBER]),
+  categoryController.findAll
+);
+router.get("/one/category/:id", 
+  authMiddleware,
+  aclMiddleware([ROLES.ADMIN, ROLES.MEMBER]),
+  categoryController.findOne
+)
 
 export default router;

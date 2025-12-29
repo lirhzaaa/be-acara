@@ -24,7 +24,7 @@ export default {
           status: 403,
           message,
         },
-        data: error.errors,
+        error: error.errors,
       });
     }
   },
