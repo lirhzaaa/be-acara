@@ -5,6 +5,7 @@ import aclMiddleware from "../middleware/aclMiddleware";
 import mediaMiddleware from "../middleware/mediaMiddleware";
 import { ROLES } from "../utils/constant";
 import mediaController from "../controllers/media.controller";
+import categoryController from "../controllers/category.controller";
 
 const router = express.Router();
 
@@ -31,6 +32,11 @@ router.delete("/media/remove", [
   mediaController.remove,
 ]);
 
-router.post("/create/category", authMiddleware, )
+router.post(
+  "/create/category",
+  authMiddleware,
+  aclMiddleware([ROLES.ADMIN, ROLES.MEMBER]),
+  categoryController.create
+);
 
 export default router;
