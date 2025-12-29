@@ -1,49 +1,34 @@
 import { Response } from "express";
 import { IReqUser } from "../utils/interfaces";
 import upload from "../utils/upload";
+import response from "../utils/response";
 
 export default {
   async single(req: IReqUser, res: Response) {
     if (!req.file) {
-      return res.status(400).json({
-        message: "file is not exist",
-        data: null,
-      });
+      return response.error(res, null, "file is not exist")
     }
 
     try {
       const result = await upload.uploadSingle(req.file as Express.Multer.File);
-      res.status(200).json({
-        message: "Success upload file",
-        data: result
-      });
+      response.success(res, result, "Success upload file")
     } catch {
-      res.status(500).json({
-        message: "Failed upload a file",
-      });
+      response.error(res, null, "Failed upload a file")
     }
   },
 
   async multiple(req: IReqUser, res: Response) {
     if (!req.files || req.files.length === 0) {
-      return res.status(400).json({
-        message: "files are not exist",
-        data: null,
-      });
+      return response.error(res, null, "Files are not exist")
     }
 
     try {
       const result = await upload.uploadMultiple(
         req.files as Express.Multer.File[]
       );
-      res.status(200).json({
-        message: "Success upload files",
-        data: result
-      });
+      response.success(res, result, "Success upload files")
     } catch {
-      res.status(500).json({
-        message: "Failed upload files",
-      });
+      response.error(res, null, "Failed upload files")
     }
   },
 
@@ -51,15 +36,9 @@ export default {
     try {
       const { fileUrl } = req.body as { fileUrl: string };
       const result = await upload.remove(fileUrl);
-      res.status(200).json({
-        message: "Success remove file",
-        data: result,
-      });
-    } catch (error) {
-      res.status(500).json({
-        message: "Failed remove file",
-        data: null,
-      });
+      response.success(res, result, "Success remove file")
+    } catch {
+      response.error(res, null, "Failed remove file")
     }
   },
 };

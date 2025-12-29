@@ -31,4 +31,6 @@ router.delete("/media/remove", [
   mediaController.remove,
 ]);
 
+router.post("/create/category", authMiddleware, )
+
 export default router;
