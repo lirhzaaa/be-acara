@@ -44,10 +44,23 @@ router.get(
   aclMiddleware([ROLES.ADMIN, ROLES.MEMBER]),
   categoryController.findAll
 );
-router.get("/one/category/:id", 
+router.get(
+  "/one/category/:id",
   authMiddleware,
   aclMiddleware([ROLES.ADMIN, ROLES.MEMBER]),
   categoryController.findOne
-)
+);
+router.put(
+  "/update/category/:id",
+  authMiddleware,
+  aclMiddleware([ROLES.ADMIN, ROLES.MEMBER]),
+  categoryController.update
+);
+router.delete(
+  "/delete/category/:id",
+  authMiddleware,
+  aclMiddleware([ROLES.ADMIN, ROLES.MEMBER]),
+  categoryController.delete
+);
 
 export default router;

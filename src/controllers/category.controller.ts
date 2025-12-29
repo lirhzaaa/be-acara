@@ -65,10 +65,22 @@ export default {
   },
   async update(req: IReqUser, res: Response) {
     try {
-    } catch (error) {}
+      const { id } = req.params;
+      const result = await CategoryModel.findByIdAndUpdate(id, req.body, {
+        new: true,
+      });
+      response.success(res, result, "Success update category");
+    } catch (error) {
+      response.error(res, error, "Failed find one category");
+    }
   },
   async delete(req: IReqUser, res: Response) {
     try {
-    } catch (error) {}
+      const { id } = req.params;
+      const result = await CategoryModel.findByIdAndDelete(id);
+      response.success(res, result, "Success delete category");
+    } catch (error) {
+      response.error(res, error, "Failed delete category");
+    }
   },
 };
