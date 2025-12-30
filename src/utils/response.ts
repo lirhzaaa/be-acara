@@ -1,11 +1,12 @@
 import { Response } from "express";
+import mongoose from "mongoose";
 import * as Yup from "yup";
 
 type Pagination = {
-    totalPages: number
-    current: number
-    total: number
-}
+  totalPages: number;
+  current: number;
+  total: number;
+};
 
 export default {
   success(res: Response, data: any, message: string) {
@@ -14,7 +15,7 @@ export default {
         status: 200,
         message,
       },
-      data
+      data,
     });
   },
   error(res: Response, error: unknown, message: string) {
@@ -24,9 +25,42 @@ export default {
           status: 403,
           message,
         },
-        error: error.errors,
+        data: {
+          [`${error.path}`]: error.errors[0],
+        },
       });
     }
+
+    if (error instanceof mongoose.Error) {
+      return res.status(500).json({
+        meta: {
+          status: 500,
+          message: error.message,
+        },
+        data: {
+          data: error.name,
+        },
+      });
+    }
+
+    if ((error as any)?.code) {
+      const _err = error as any;
+      return res.status(500).json({
+        meta: {
+          status: 500,
+          message: _err.errorResponse.errmsg,
+        },
+        data: _err,
+      });
+    }
+
+    res.status(500).json({
+      meta: {
+        status: 500,
+        message,
+      },
+      data: error,
+    });
   },
   unauthorized(res: Response, message: string = "Unauthorized") {
     res.status(403).json({
@@ -37,14 +71,19 @@ export default {
       data: null,
     });
   },
-  pagination(res: Response, data: any[], pagination: Pagination, message: string) {
+  pagination(
+    res: Response,
+    data: any[],
+    pagination: Pagination,
+    message: string
+  ) {
     return res.status(200).json({
-        meta: {
-            status: 200,
-            message
-        },
-        data,
-        pagination
-    })
+      meta: {
+        status: 200,
+        message,
+      },
+      data,
+      pagination,
+    });
   },
 };
