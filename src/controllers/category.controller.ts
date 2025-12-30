@@ -74,10 +74,12 @@ export default {
       response.error(res, error, "Failed find one category");
     }
   },
-  async delete(req: IReqUser, res: Response) {
+  async remove(req: IReqUser, res: Response) {
     try {
       const { id } = req.params;
-      const result = await CategoryModel.findByIdAndDelete(id);
+      const result = await CategoryModel.findByIdAndDelete(id, {
+        new: true,
+      });
       response.success(res, result, "Success delete category");
     } catch (error) {
       response.error(res, error, "Failed delete category");
