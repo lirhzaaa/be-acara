@@ -36,8 +36,30 @@ const doc = {
         confirmPassword: "12345678",
       },
       ActivationRequest: {
-        code: "abcdef"
-      }
+        code: "abcdef",
+      },
+      CreateCategoryRequest: {
+        name: "",
+        description: "",
+        icon: "",
+      },
+      CreateEventRequest: {
+        name: "",
+        banner: "fileUrl",
+        category: "category ObjectID",
+        description: "",
+        startDate: "yyy-mm-dd hh:mm:ss",
+        endDate: "yyy-mm-dd hh:mm:ss",
+        location: {
+          region: "region id",
+          coordinate: [0, 0],
+        },
+        isOnline: false,
+        isFeatured: false,
+      },
+      RemoveMediaRequest: {
+        fileUrl: "",
+      },
     },
   },
 };
