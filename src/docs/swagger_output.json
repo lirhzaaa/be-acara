@@ -124,7 +124,7 @@
         }
       }
     },
-    "/create/category": {
+    "/category": {
       "post": {
         "tags": [
           "Category"
@@ -155,9 +155,7 @@
             }
           }
         }
-      }
-    },
-    "/category": {
+      },
       "get": {
         "tags": [
           "Category"
@@ -214,9 +212,7 @@
             "description": ""
           }
         }
-      }
-    },
-    "/update/category/{id}": {
+      },
       "put": {
         "tags": [
           "Category"
@@ -257,9 +253,7 @@
             }
           }
         }
-      }
-    },
-    "/delete/category/{id}": {
+      },
       "delete": {
         "tags": [
           "Category"
@@ -804,11 +798,11 @@
           },
           "startDate": {
             "type": "string",
-            "example": "yyy-mm-dd hh:mm:ss"
+            "example": "yyyy-mm-dd hh:mm:ss"
           },
           "endDate": {
             "type": "string",
-            "example": "yyy-mm-dd hh:mm:ss"
+            "example": "yyyy-mm-dd hh:mm:ss"
           },
           "location": {
             "type": "object",
@@ -826,6 +820,10 @@
                 "items": {
                   "type": "number"
                 }
+              },
+              "address": {
+                "type": "string",
+                "example": "address"
               }
             }
           },
@@ -834,6 +832,10 @@
             "example": false
           },
           "isFeatured": {
+            "type": "boolean",
+            "example": false
+          },
+          "isPublish": {
             "type": "boolean",
             "example": false
           }

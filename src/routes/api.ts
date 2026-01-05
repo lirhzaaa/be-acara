@@ -17,7 +17,7 @@ router.get("/auth/me", authMiddleware, authController.me);
 router.post("/auth/activation", authController.activationCode);
 
 router.post(
-  "/create/category",
+  "/category",
   [authMiddleware, aclMiddleware([ROLES.ADMIN])],
   categoryController.create
   /*
@@ -48,7 +48,7 @@ router.get(
   */
 );
 router.put(
-  "/update/category/:id",
+  "/category/:id",
   [authMiddleware, aclMiddleware([ROLES.ADMIN])],
   categoryController.update
   /*
@@ -65,7 +65,7 @@ router.put(
   */
 );
 router.delete(
-  "/delete/category/:id",
+  "/category/:id",
   [authMiddleware, aclMiddleware([ROLES.ADMIN])],
   categoryController.remove
   /*

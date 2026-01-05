@@ -48,14 +48,16 @@ const doc = {
         banner: "fileUrl",
         category: "category ObjectID",
         description: "",
-        startDate: "yyy-mm-dd hh:mm:ss",
-        endDate: "yyy-mm-dd hh:mm:ss",
+        startDate: "yyyy-mm-dd hh:mm:ss",
+        endDate: "yyyy-mm-dd hh:mm:ss",
         location: {
           region: "region id",
           coordinate: [0, 0],
+          address: "address",
         },
         isOnline: false,
         isFeatured: false,
+        isPublish: false,
       },
       RemoveMediaRequest: {
         fileUrl: "",
