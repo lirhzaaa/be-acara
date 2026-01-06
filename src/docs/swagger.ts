@@ -38,6 +38,11 @@ const doc = {
       ActivationRequest: {
         code: "abcdef",
       },
+      CreateBannerRequest: {
+        title: "",
+        image: "",
+        isShow: false
+      },
       CreateCategoryRequest: {
         name: "",
         description: "",
