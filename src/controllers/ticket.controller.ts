@@ -60,6 +60,11 @@ export default {
   async findOne(req: IReqUser, res: Response) {
     try {
       const { id } = req.params;
+
+      if (!isValidObjectId(id)) {
+        return response.notFound(res, "Failed find one ticket");
+      }
+
       const result = await TicketModel.findById(id);
 
       if (!result) {
@@ -75,6 +80,11 @@ export default {
   async update(req: IReqUser, res: Response) {
     try {
       const { id } = req.params;
+
+      if (!isValidObjectId(id)) {
+        return response.notFound(res, "Failed update category");
+      }
+
       const result = await TicketModel.findByIdAndUpdate(id, req.body, {
         new: true,
       });
@@ -102,6 +112,11 @@ export default {
   async delete(req: IReqUser, res: Response) {
     try {
       const { id } = req.params;
+
+      if (!isValidObjectId(id)) {
+        return response.notFound(res, "Failed delete category");
+      }
+
       const result = await TicketModel.findByIdAndDelete(id, { new: true });
       response.success(res, result, "Success to delete ticket");
     } catch (error) {
