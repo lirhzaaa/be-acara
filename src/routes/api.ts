@@ -9,10 +9,7 @@ import categoryController from "../controllers/category.controller";
 import regionController from "../controllers/region.controller";
 import eventController from "../controllers/event.controller";
 import ticketController from "../controllers/ticket.controller";
-<<<<<<< HEAD
-=======
 import bannerController from "../controllers/banner.controller";
->>>>>>> e61cf8a (feat (API BANNER): Create CRUD API BANNER and update response for not found)
 
 const router = express.Router();
 
@@ -22,12 +19,6 @@ router.get("/auth/me", authMiddleware, authController.me);
 router.post("/auth/activation", authController.activationCode);
 
 router.post(
-<<<<<<< HEAD
-  "/tickets",
-  [authMiddleware, aclMiddleware([ROLES.ADMIN])],
-  ticketController.create
-);
-=======
   "/banners",
   [authMiddleware, aclMiddleware([ROLES.ADMIN])],
   bannerController.create
@@ -49,7 +40,6 @@ router.post(
     [authMiddleware, aclMiddleware([ROLES.ADMIN])],
     ticketController.create
   );
->>>>>>> e61cf8a (feat (API BANNER): Create CRUD API BANNER and update response for not found)
 router.get("/tickets", ticketController.get);
 router.get("/tickets/:id", ticketController.getOne);
 router.get("/tickets/:eventId/events", ticketController.getOneByEvent);
