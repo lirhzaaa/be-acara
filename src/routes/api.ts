@@ -40,9 +40,9 @@ router.post(
     [authMiddleware, aclMiddleware([ROLES.ADMIN])],
     ticketController.create
   );
-router.get("/tickets", ticketController.get);
-router.get("/tickets/:id", ticketController.getOne);
-router.get("/tickets/:eventId/events", ticketController.getOneByEvent);
+router.get("/tickets", ticketController.find);
+router.get("/tickets/:id", ticketController.findOne);
+router.get("/tickets/:eventId/events", ticketController.findOneByEvent);
 router.put(
   "/tickets/:id",
   [authMiddleware, aclMiddleware([ROLES.ADMIN])],

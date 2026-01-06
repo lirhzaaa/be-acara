@@ -15,7 +15,7 @@ export default {
     }
   },
 
-  async get(req: IReqUser, res: Response) {
+  async find(req: IReqUser, res: Response) {
     try {
       const {
         limit = 10,
@@ -50,20 +50,25 @@ export default {
           current: page,
           totalPages: Math.ceil(count / limit),
         },
-        "Success to get all ticket"
+        "Success to find all ticket"
       );
     } catch (error) {
-      response.error(res, error, "Failed to get all ticket");
+      response.error(res, error, "Failed to find all ticket");
     }
   },
 
-  async getOne(req: IReqUser, res: Response) {
+  async findOne(req: IReqUser, res: Response) {
     try {
       const { id } = req.params;
       const result = await TicketModel.findById(id);
-      response.success(res, result, "Success to get one ticket");
+
+      if (!result) {
+        return response.notFound(res, "Failed find one ticket");
+      }
+
+      response.success(res, result, "Success to find one ticket");
     } catch (error) {
-      response.error(res, error, "Failed to get one ticket");
+      response.error(res, error, "Failed to find one ticket");
     }
   },
 
@@ -79,7 +84,7 @@ export default {
     }
   },
 
-  async getOneByEvent(req: IReqUser, res: Response) {
+  async findOneByEvent(req: IReqUser, res: Response) {
     try {
       const { eventId } = req.params;
 
@@ -88,9 +93,9 @@ export default {
       }
 
       const result = await TicketModel.find({ events: eventId } as any).exec();
-      response.success(res, result, "success to get ticket by event");
+      response.success(res, result, "success to find ticket by event");
     } catch (error) {
-      response.error(res, error, "Failed to get ticket by event");
+      response.error(res, error, "Failed to find ticket by event");
     }
   },
 

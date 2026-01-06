@@ -56,6 +56,11 @@ export default {
     try {
       const { id } = req.params;
       const result = await EventModel.findById(id);
+
+      if (!result) {
+        return response.notFound(res, "Failed find one event");
+      }
+
       response.success(res, result, "Success to find one an event");
     } catch (error) {
       response.error(res, error, "Failed to find one an event");
@@ -87,6 +92,11 @@ export default {
     try {
       const { slug } = req.params;
       const result = await EventModel.findOne({ slug });
+
+      if (!result) {
+        return response.notFound(res, "Failed find event");
+      }
+
       response.success(res, result, "Success find one by slug an event");
     } catch (error) {
       response.error(res, error, "Failed find one by slug an event");
