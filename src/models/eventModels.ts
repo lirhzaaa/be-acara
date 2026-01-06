@@ -1,7 +1,7 @@
 import mongoose, { ObjectId } from "mongoose";
 import * as Yup from "yup";
 
-export const EVENT_NAME_MODELS = "Event"
+export const EVENT_NAME_MODELS = "Event";
 
 const Schema = mongoose.Schema;
 
@@ -107,7 +107,7 @@ const EventSchema = new Schema<Event>(
   {
     timestamps: true,
   }
-);
+).index({ name: "text" });
 
 EventSchema.pre("save", function () {
   if (!this.slug) {

@@ -24,7 +24,7 @@ const BannerSchema = new Schema<Banner>({
     type: Schema.Types.Boolean,
     required: true,
   },
-});
+}).index({ title: "text" });
 
 const BannerModel = mongoose.model(BANNER_MODEL_NAME, BannerSchema);
 export default BannerModel;

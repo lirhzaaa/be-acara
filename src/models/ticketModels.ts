@@ -1,4 +1,4 @@
-import mongoose, {Schema} from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import * as Yup from "yup";
 import { EVENT_NAME_MODELS } from "./eventModels";
 
@@ -45,7 +45,7 @@ const TicketSchema = new Schema<Ticket>(
   {
     timestamps: true,
   }
-);
+).index({ name: "text" });
 
 const TicketModel = mongoose.model(TICKET_MODEL_NAME, TicketSchema);
 export default TicketModel;
