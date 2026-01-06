@@ -25,8 +25,8 @@ const doc = {
     },
     schemas: {
       LoginRequest: {
-        identifier: "lirhza",
-        password: "12345678",
+        identifier: "azhril nurmaulidan",
+        password: "azhrilnurmaulidan1234",
       },
       RegisterRequest: {
         fullName: "lirhza lirhza",
@@ -39,20 +39,27 @@ const doc = {
         code: "abcdef",
       },
       CreateBannerRequest: {
-        title: "",
-        image: "",
+        title: "banner title",
+        image: "banner.jpg",
         isShow: false
       },
+      CreateTicketRequest: {
+        name: "ticket name",
+        description: "ticket description",
+        events: "ticket events",
+        price: "ticket price",
+        quantity: "ticket quantity",
+      },
       CreateCategoryRequest: {
-        name: "",
-        description: "",
-        icon: "",
+        name: "category name",
+        description: "category description",
+        icon: "category",
       },
       CreateEventRequest: {
-        name: "",
+        name: "events name",
         banner: "fileUrl",
         category: "category ObjectID",
-        description: "",
+        description: "events - description",
         startDate: "yyyy-mm-dd hh:mm:ss",
         endDate: "yyyy-mm-dd hh:mm:ss",
         location: {

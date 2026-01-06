@@ -1043,11 +1043,11 @@
         "properties": {
           "identifier": {
             "type": "string",
-            "example": "lirhza"
+            "example": "azhril nurmaulidan"
           },
           "password": {
             "type": "string",
-            "example": "12345678"
+            "example": "azhrilnurmaulidan1234"
           }
         },
         "xml": {
@@ -1099,11 +1099,11 @@
         "properties": {
           "title": {
             "type": "string",
-            "example": ""
+            "example": "banner title"
           },
           "image": {
             "type": "string",
-            "example": ""
+            "example": "banner.jpg"
           },
           "isShow": {
             "type": "boolean",
@@ -1114,20 +1114,48 @@
           "name": "CreateBannerRequest"
         }
       },
+      "CreateTicketRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "ticket name"
+          },
+          "description": {
+            "type": "string",
+            "example": "ticket description"
+          },
+          "events": {
+            "type": "string",
+            "example": "ticket events"
+          },
+          "price": {
+            "type": "string",
+            "example": "ticket price"
+          },
+          "quantity": {
+            "type": "string",
+            "example": "ticket quantity"
+          }
+        },
+        "xml": {
+          "name": "CreateTicketRequest"
+        }
+      },
       "CreateCategoryRequest": {
         "type": "object",
         "properties": {
           "name": {
             "type": "string",
-            "example": ""
+            "example": "category name"
           },
           "description": {
             "type": "string",
-            "example": ""
+            "example": "category description"
           },
           "icon": {
             "type": "string",
-            "example": ""
+            "example": "category"
           }
         },
         "xml": {
@@ -1139,7 +1167,7 @@
         "properties": {
           "name": {
             "type": "string",
-            "example": ""
+            "example": "events name"
           },
           "banner": {
             "type": "string",
@@ -1151,7 +1179,7 @@
           },
           "description": {
             "type": "string",
-            "example": ""
+            "example": "events - description"
           },
           "startDate": {
             "type": "string",
