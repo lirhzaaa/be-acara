@@ -3,6 +3,8 @@ import { encrypt } from "../utils/encryption";
 import { sendEmail, renderMailHTML } from "../utils/mail/mail";
 import { ROLES } from "../utils/constant";
 
+export const USER_MODEL_NAME = "User"
+
 export interface Users {
   fullname: string;
   username: string;
@@ -95,6 +97,6 @@ UsersSchema.methods.toJSON = function () {
   return user;
 };
 
-const UserModel = mongoose.model("Users", UsersSchema);
+const UserModel = mongoose.model(USER_MODEL_NAME, UsersSchema);
 
 export default UserModel;
