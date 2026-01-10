@@ -3,8 +3,8 @@ import * as Yup from "yup";
 import { EVENT_NAME_MODELS } from "./eventModels";
 import { USER_MODEL_NAME } from "./usersModels";
 import { TICKET_MODEL_NAME } from "./ticketModels";
-// import { getId } from "../utils/id";
-import { TypeResponseMidtrans } from "../utils/payment";
+import { getId } from "../utils/id";
+import payment, { TypeResponseMidtrans } from "../utils/payment";
 
 export const ORDER_MODEL_NAME = "Order";
 
@@ -105,16 +105,28 @@ const OrderSchema = new Schema<Order>(
   }
 ).index({ orderId: "text" });
 
-// OrderSchema.pre("save", async function () {
-//   const order = this;
-//   order.orderId = getId();
-//   order.payment = await payment.createLink({
-//     transaction_details: {
-//       gross_amount: order.total,
-//       order_id: order.orderId,
-//     },
-//   });
-// });
+OrderSchema.pre("save", async function () {
+  const order = this as any;
+
+  if (!order.total) {
+    throw new Error("Total belum ada");
+  }
+
+  order.orderId = getId();
+
+  const paymentResult = await payment.createLink({
+    transaction_details: {
+      gross_amount: order.total,
+      order_id: order.orderId,
+    },
+  });
+
+  if (!paymentResult?.token || !paymentResult?.redirect_url) {
+    throw new Error("Payment response invalid");
+  }
+
+  order.payment = paymentResult;
+});
 
 const OrderModel = mongoose.model(ORDER_MODEL_NAME, OrderSchema);
 
