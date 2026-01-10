@@ -14,15 +14,19 @@ export default {
 async create(req: IReqUser, res: Response) {
   try {
     const userId = req.user?.id;
+    console.log("1️⃣ User ID:", userId);
     
     const payload = {
       ...req.body,
       createdBy: userId,
     };
+    console.log("2️⃣ Payload:", payload);
 
     await orderDAO.validate(payload);
+    console.log("3️⃣ Validation passed");
 
     const ticket = await TicketModel.findById(payload.ticket);
+    console.log("4️⃣ Ticket:", ticket);
 
     if (!ticket) return response.notFound(res, "Ticket Not Found");
     if (ticket.quantity < payload.quantity) {
@@ -30,22 +34,23 @@ async create(req: IReqUser, res: Response) {
     }
     
     const total: number = +ticket?.price * +payload.quantity;
+    console.log("5️⃣ Total:", total);
 
     const finalPayload = {
       ...payload,
       total,
       orderId: getId(),
     };
+    console.log("6️⃣ Final Payload:", finalPayload);
 
-    console.log("payload:", finalPayload);
-
+    console.log("7️⃣ Creating order...");
     const result = await OrderModel.create(finalPayload as any);
-    
-    console.log("success", result);
+    console.log("8️⃣ Success:", result);
     
     response.success(res, result, "Success to create an order");
-  } catch (error) {
-    console.error("error", error);
+  } catch (error: any) {
+    console.error("❌ ERROR:", error);
+    console.error("❌ MESSAGE:", error.message);
     response.error(res, error, "Failed to create an order");
   }
 },  
