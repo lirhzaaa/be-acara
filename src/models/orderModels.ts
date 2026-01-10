@@ -1,4 +1,4 @@
-import mongoose, { ObjectId, Schema } from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 import * as Yup from "yup";
 import { EVENT_NAME_MODELS } from "./eventModels";
 import { USER_MODEL_NAME } from "./usersModels";
@@ -33,10 +33,10 @@ export interface Order
   total: number;
   status: string;
   payment: TypeResponseMidtrans;
-  createdBy: ObjectId;
-  events: ObjectId;
+  createdBy: Types.ObjectId | string;
+  events: Types.ObjectId | string;
+  ticket: Types.ObjectId | string;
   orderId: string;
-  ticket: ObjectId;
   quantity: number;
   vouchers: TypeVoucher[];
 }
