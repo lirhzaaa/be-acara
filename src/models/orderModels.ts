@@ -1,21 +1,21 @@
-import mongoose, { mongo, ObjectId, Schema } from "mongoose";
+import mongoose, { ObjectId, Schema } from "mongoose";
 import * as Yup from "yup";
+import { EVENT_NAME_MODELS } from "./eventModels";
+import { USER_MODEL_NAME } from "./usersModels";
+import { TICKET_MODEL_NAME } from "./ticketModels";
 import { getId } from "../utils/id";
 import payment, { TypeResponseMidtrans } from "../utils/payment";
-import { USER_MODEL_NAME } from "./usersModels";
-import { EVENT_NAME_MODELS } from "./eventModels";
-import { TICKET_MODEL_NAME } from "./ticketModels";
 
 export const ORDER_MODEL_NAME = "Order";
 
-export const orderDTO = Yup.object({
+export const orderDAO = Yup.object({
   createdBy: Yup.string().required(),
   events: Yup.string().required(),
   ticket: Yup.string().required(),
   quantity: Yup.number().required(),
 });
 
-export type TypeOrder = Yup.InferType<typeof orderDTO>;
+export type TypeOrder = Yup.InferType<typeof orderDAO>;
 
 export enum OrderStatus {
   PENDING = "pending",
@@ -35,8 +35,8 @@ export interface Order
   payment: TypeResponseMidtrans;
   createdBy: ObjectId;
   events: ObjectId;
-  orderId: string;
   ticket: ObjectId;
+  orderId: string;
   quantity: number;
   vouchers: TypeVoucher[];
 }
@@ -45,6 +45,7 @@ const OrderSchema = new Schema<Order>(
   {
     orderId: {
       type: Schema.Types.String,
+      required: true
     },
     createdBy: {
       type: Schema.Types.ObjectId,

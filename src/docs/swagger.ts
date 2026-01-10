@@ -41,7 +41,12 @@ const doc = {
       CreateBannerRequest: {
         title: "banner title",
         image: "banner.jpg",
-        isShow: false
+        isShow: false,
+      },
+      CreateOrderRequest: {
+        events: "674a1b2c3d4e5f6g7h8i9j0k",
+        ticket: "674a1b2c3d4e5f6g7h8i9j0k",
+        quantity: 2,
       },
       CreateTicketRequest: {
         name: "ticket name",
