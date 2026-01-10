@@ -45,7 +45,7 @@ const OrderSchema = new Schema<Order>(
   {
     orderId: {
       type: Schema.Types.String,
-      required: true  
+      required: true,
     },
     createdBy: {
       type: Schema.Types.ObjectId,
@@ -65,11 +65,11 @@ const OrderSchema = new Schema<Order>(
       type: {
         token: {
           type: Schema.Types.String,
-          required: true,
+          required: false,
         },
         redirect_url: {
           type: Schema.Types.String,
-          required: true,
+          required: false,
         },
       },
     },
@@ -108,14 +108,17 @@ const OrderSchema = new Schema<Order>(
 
 OrderSchema.pre("save", async function () {
   const order = this;
-  order.payment = await payment.createLink({
-    transaction_details: {
-      gross_amount: order.total,
-      order_id: order.orderId,
-    },
-  });
+  try {
+    order.payment = await payment.createLink({
+      transaction_details: {
+        gross_amount: order.total,
+        order_id: order.orderId,
+      },
+    });
+  } catch (error) {
+    console.log("Midtrans Payment Error:", error);
+  }
 });
 
 const OrderModel = mongoose.model(ORDER_MODEL_NAME, OrderSchema);
 export default OrderModel;
-  
