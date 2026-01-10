@@ -1,21 +1,21 @@
-import mongoose, { ObjectId, Schema } from "mongoose";
+import mongoose, { mongo, ObjectId, Schema } from "mongoose";
 import * as Yup from "yup";
-import { EVENT_NAME_MODELS } from "./eventModels";
-import { USER_MODEL_NAME } from "./usersModels";
-import { TICKET_MODEL_NAME } from "./ticketModels";
 import { getId } from "../utils/id";
 import payment, { TypeResponseMidtrans } from "../utils/payment";
+import { USER_MODEL_NAME } from "./usersModels";
+import { EVENT_NAME_MODELS } from "./eventModels";
+import { TICKET_MODEL_NAME } from "./ticketModels";
 
 export const ORDER_MODEL_NAME = "Order";
 
-export const orderDAO = Yup.object({
+export const orderDTO = Yup.object({
   createdBy: Yup.string().required(),
   events: Yup.string().required(),
   ticket: Yup.string().required(),
   quantity: Yup.number().required(),
 });
 
-export type TypeOrder = Yup.InferType<typeof orderDAO>;
+export type TypeOrder = Yup.InferType<typeof orderDTO>;
 
 export enum OrderStatus {
   PENDING = "pending",
@@ -33,10 +33,10 @@ export interface Order
   total: number;
   status: string;
   payment: TypeResponseMidtrans;
-  createdBy: ObjectId | string;
-  events: ObjectId | string;
-  ticket: ObjectId | string;
+  createdBy: ObjectId;
+  events: ObjectId;
   orderId: string;
+  ticket: ObjectId;
   quantity: number;
   vouchers: TypeVoucher[];
 }
@@ -117,5 +117,4 @@ OrderSchema.pre("save", async function () {
 });
 
 const OrderModel = mongoose.model(ORDER_MODEL_NAME, OrderSchema);
-
 export default OrderModel;

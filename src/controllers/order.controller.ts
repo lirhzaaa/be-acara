@@ -2,13 +2,13 @@ import { Response } from "express";
 import { IReqUser } from "../utils/interfaces";
 import response from "../utils/response";
 import OrderModel, {
-  orderDAO,
+  orderDTO,
   OrderStatus,
   TypeOrder,
   TypeVoucher,
 } from "../models/orderModels";
-import TicketModel from "../models/ticketModels";
 import { getId } from "../utils/id";
+import TicketModel from "../models/ticketModels";
 
 export default {
   async create(req: IReqUser, res: Response) {
@@ -18,13 +18,14 @@ export default {
         ...req.body,
         createdBy: userId,
       } as TypeOrder;
+      await orderDTO.validate(payload);
 
-      await orderDAO.validate(payload);
       const ticket = await TicketModel.findById(payload.ticket);
-      if (!ticket) return response.notFound(res, "Ticket Not Found");
+      if (!ticket) return response.notFound(res, "ticket not found");
       if (ticket.quantity < payload.quantity) {
-        return response.error(res, null, "Ticket quantity is not enough");
+        return response.error(res, null, "ticket quantity is not enough");
       }
+
       const total: number = +ticket?.price * +payload.quantity;
 
       Object.assign(payload, {
@@ -33,12 +34,11 @@ export default {
       });
 
       const result = await OrderModel.create(payload);
-      response.success(res, result, "Success to create an order");
+      response.success(res, result, "success to create an order");
     } catch (error) {
-      response.error(res, error, "Failed to create an order");
+      response.error(res, error, "failed to create an order");
     }
   },
-
   async findAll(req: IReqUser, res: Response) {
     try {
       const buildQuery = (filter: any) => {
@@ -59,9 +59,11 @@ export default {
         .limit(+limit)
         .skip((+page - 1) * +limit)
         .sort({ createdAt: -1 })
+        .lean()
         .exec();
 
       const count = await OrderModel.countDocuments(query);
+
       response.pagination(
         res,
         result,
@@ -70,13 +72,12 @@ export default {
           total: count,
           totalPages: Math.ceil(count / +limit),
         },
-        "Success to find all an order"
+        "success find all orders"
       );
     } catch (error) {
-      response.error(res, error, "Failed to find all an order");
+      response.error(res, error, "failed find all orders");
     }
   },
-
   async findOne(req: IReqUser, res: Response) {
     try {
       const { orderId } = req.params;
@@ -84,16 +85,58 @@ export default {
         orderId,
       });
 
-      if (!result) return response.notFound(res, "Order Not Found");
-      response.success(res, result, "Success to find one an order");
+      if (!result) return response.notFound(res, "order not found");
+
+      response.success(res, result, "success to find one an order");
     } catch (error) {
-      response.error(res, error, "Failed to find one an order");
+      response.error(res, error, "failed to find one an order");
     }
   },
 
-  async findAllMember(req: IReqUser, res: Response) {},
+  async findAllByMember(req: IReqUser, res: Response) {
+    try {
+      const userId = req.user?.id;
+      const buildQuery = (filter: any) => {
+        let query: Record<string, any> = {
+          createdBy: userId,
+        };
 
-  async completed(req: IReqUser, res: Response) {
+        if (filter.search) query.$text = { $search: filter.search };
+
+        return query;
+      };
+
+      const { limit = 10, page = 1, search } = req.query;
+
+      const query = buildQuery({
+        search,
+      });
+
+      const result = await OrderModel.find(query)
+        .limit(+limit)
+        .skip((+page - 1) * +limit)
+        .sort({ createdAt: -1 })
+        .lean()
+        .exec();
+
+      const count = await OrderModel.countDocuments(query);
+
+      response.pagination(
+        res,
+        result,
+        {
+          current: +page,
+          total: count,
+          totalPages: Math.ceil(count / +limit),
+        },
+        "success find all orders"
+      );
+    } catch (error) {
+      response.error(res, error, "failed find all orders");
+    }
+  },
+
+  async complete(req: IReqUser, res: Response) {
     try {
       const { orderId } = req.params;
       const userId = req.user?.id;
@@ -103,7 +146,8 @@ export default {
         createdBy: userId,
       });
 
-      if (!order) return response.notFound(res, "Order Not Found");
+      if (!order) return response.notFound(res, "order not found");
+
       if (order.status === OrderStatus.COMPLETED)
         return response.error(res, null, "you have been completed this order");
 
@@ -131,33 +175,117 @@ export default {
         }
       );
 
-      const ticket = await TicketModel.findById(order.ticket)
+      const ticket = await TicketModel.findById(order.ticket);
+      if (!ticket) return response.notFound(res, "ticket and order not found");
 
-      if (!ticket) return response.notFound(res, "Ticket and Order Not Found")
-    
-        await TicketModel.updateOne({
-            _id: ticket._id
-        }, {
-            quantity: ticket.quantity - order.quantity
-        })
+      await TicketModel.updateOne(
+        {
+          _id: ticket._id,
+        },
+        {
+          quantity: ticket.quantity - order.quantity,
+        }
+      );
 
-      response.success(res, result, "Success to complete an order")
+      response.success(res, result, "success to complete an order");
     } catch (error) {
-      response.error(res, error, "Failed to completed an order");
+      response.error(res, error, "failed to complete an order");
     }
   },
-
   async pending(req: IReqUser, res: Response) {
     try {
+      const { orderId } = req.params;
+
+      const order = await OrderModel.findOne({
+        orderId,
+      });
+
+      if (!order) return response.notFound(res, "order not found");
+
+      if (order.status === OrderStatus.COMPLETED) {
+        return response.error(res, null, "this order has been completed");
+      }
+
+      if (order.status === OrderStatus.PENDING) {
+        return response.error(
+          res,
+          null,
+          "this order currently in payment pending"
+        );
+      }
+
+      const result = await OrderModel.findOneAndUpdate(
+        { orderId },
+        {
+          status: OrderStatus.PENDING,
+        },
+        {
+          new: true,
+        }
+      );
+
+      response.success(res, result, "success to pending an order");
     } catch (error) {
-      response.error(res, error, "Failed to pending an order");
+      response.error(res, error, "failed to pending an order");
+    }
+  },
+  async cancelled(req: IReqUser, res: Response) {
+    try {
+      const { orderId } = req.params;
+
+      const order = await OrderModel.findOne({
+        orderId,
+      });
+
+      if (!order) return response.notFound(res, "order not found");
+
+      if (order.status === OrderStatus.COMPLETED) {
+        return response.error(res, null, "this order has been completed");
+      }
+
+      if (order.status === OrderStatus.CANCELLED) {
+        return response.error(
+          res,
+          null,
+          "this order currently in payment cancelled"
+        );
+      }
+
+      const result = await OrderModel.findOneAndUpdate(
+        { orderId },
+        {
+          status: OrderStatus.CANCELLED,
+        },
+        {
+          new: true,
+        }
+      );
+
+      response.success(res, result, "success to cancelled an order");
+    } catch (error) {
+      response.error(res, error, "failed to cancelled an order");
     }
   },
 
-  async cancelled(req: IReqUser, res: Response) {
+  async remove(req: IReqUser, res: Response) {
     try {
+      const { orderId } = req.params;
+      const result = await OrderModel.findOneAndDelete(
+        {
+          orderId,
+        },
+        {
+          new: true,
+        }
+      );
+
+      if (!result) {
+        return response.notFound(res, "order not found");
+      }
+
+      response.success(res, result, "success to remove an order");
     } catch (error) {
-      response.error(res, error, "Failed to cancelled an order");
+      response.error(res, error, "failed to remove an order");
     }
   },
 };
