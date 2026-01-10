@@ -33,10 +33,10 @@ export interface Order
   total: number;
   status: string;
   payment: TypeResponseMidtrans;
-  createdBy: ObjectId | string;
-  events: ObjectId | string;
-  ticket: ObjectId | string;
+  createdBy: ObjectId;
+  events: ObjectId;
   orderId: string;
+  ticket: ObjectId;
   quantity: number;
   vouchers: TypeVoucher[];
 }
