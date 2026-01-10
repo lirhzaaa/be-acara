@@ -45,7 +45,7 @@ const OrderSchema = new Schema<Order>(
   {
     orderId: {
       type: Schema.Types.String,
-      required: true  
+      required: true,
     },
     createdBy: {
       type: Schema.Types.ObjectId,
@@ -108,7 +108,6 @@ const OrderSchema = new Schema<Order>(
 
 OrderSchema.pre("save", async function () {
   const order = this;
-  order.orderId = getId();
   order.payment = await payment.createLink({
     transaction_details: {
       gross_amount: order.total,
@@ -119,4 +118,3 @@ OrderSchema.pre("save", async function () {
 
 const OrderModel = mongoose.model(ORDER_MODEL_NAME, OrderSchema);
 export default OrderModel;
-  
