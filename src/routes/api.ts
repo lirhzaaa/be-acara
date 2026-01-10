@@ -19,78 +19,78 @@ router.post("/auth/login", authController.login);
 router.get("/auth/me", authMiddleware, authController.me);
 router.post("/auth/activation", authController.activationCode);
 
-// router.post(
-//   "/orders",
-//   [authMiddleware, aclMiddleware([ROLES.MEMBER])],
-//   orderController.create
-//   /*
-//   #swagger.tags = ['Order']
-//   #swagger.security = [{
-//     "bearerAuth": ""
-//   }]
-//   #swagger.requestBody = {
-//     required: true,
-//     schema: {
-//       $ref: "#/components/schemas/CreateOrderRequest"
-//     }
-//   }
-//   */
-// );
-// router.get(
-//   "/orders",
-//   [authMiddleware, aclMiddleware([ROLES.ADMIN])],
-//   orderController.findAll
-//   /*
-//   #swagger.tags = ['Order']
-//   #swagger.security = [{
-//     "bearerAuth": ""
-//   }]
-//   */
-// );
-// router.get(
-//   "/orders/:orderId",
-//   [authMiddleware, aclMiddleware([ROLES.ADMIN, ROLES.MEMBER])],
-//   orderController.findOne
-//   /*
-//   #swagger.tags = ['Order']
-//   #swagger.security = [{
-//     "bearerAuth": ""
-//   }]
-//   */
-// );
-// router.put(
-//   "/orders/:orderId/completed",
-//   [authMiddleware, aclMiddleware([ROLES.MEMBER])],
-//   orderController.completed
-//   /*
-//   #swagger.tags = ['Order']
-//   #swagger.security = [{
-//     "bearerAuth": ""
-//   }]
-//   */
-// );
-// router.put(
-//   "/orders/:orderId/pending",
-//   [authMiddleware, aclMiddleware([ROLES.ADMIN])],
-//   orderController.pending
-//   /*
-//   #swagger.tags = ['Order']
-//   #swagger.security = [{
-//     "bearerAuth": ""
-//   }]
-//   */
-// );
-// router.put(
-//   "/orders/:orderId/cancelled",
-//   [authMiddleware, aclMiddleware([ROLES.ADMIN])],
-//   orderController.cancelled
-//   /*
-//   #swagger.tags = ['Order']
-//   #swagger.security = [{
-//     "bearerAuth": ""
-//   }]
-//   */
-// );
+router.post(
+  "/orders",
+  [authMiddleware, aclMiddleware([ROLES.MEMBER])],
+  orderController.create
+  /*
+  #swagger.tags = ['Order']
+  #swagger.security = [{
+    "bearerAuth": ""
+  }]
+  #swagger.requestBody = {
+    required: true,
+    schema: {
+      $ref: "#/components/schemas/CreateOrderRequest"
+    }
+  }
+  */
+);
+router.get(
+  "/orders",
+  [authMiddleware, aclMiddleware([ROLES.ADMIN])],
+  orderController.findAll
+  /*
+  #swagger.tags = ['Order']
+  #swagger.security = [{
+    "bearerAuth": ""
+  }]
+  */
+);
+router.get(
+  "/orders/:orderId",
+  [authMiddleware, aclMiddleware([ROLES.ADMIN, ROLES.MEMBER])],
+  orderController.findOne
+  /*
+  #swagger.tags = ['Order']
+  #swagger.security = [{
+    "bearerAuth": ""
+  }]
+  */
+);
+router.put(
+  "/orders/:orderId/completed",
+  [authMiddleware, aclMiddleware([ROLES.MEMBER])],
+  orderController.completed
+  /*
+  #swagger.tags = ['Order']
+  #swagger.security = [{
+    "bearerAuth": ""
+  }]
+  */
+);
+router.put(
+  "/orders/:orderId/pending",
+  [authMiddleware, aclMiddleware([ROLES.ADMIN])],
+  orderController.pending
+  /*
+  #swagger.tags = ['Order']
+  #swagger.security = [{
+    "bearerAuth": ""
+  }]
+  */
+);
+router.put(
+  "/orders/:orderId/cancelled",
+  [authMiddleware, aclMiddleware([ROLES.ADMIN])],
+  orderController.cancelled
+  /*
+  #swagger.tags = ['Order']
+  #swagger.security = [{
+    "bearerAuth": ""
+  }]
+  */
+);
 
 
 router.post(
