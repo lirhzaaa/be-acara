@@ -1,4 +1,4 @@
-import mongoose, { Schema, Types } from "mongoose";
+import mongoose, { ObjectId, Schema } from "mongoose";
 import * as Yup from "yup";
 import { EVENT_NAME_MODELS } from "./eventModels";
 import { USER_MODEL_NAME } from "./usersModels";
@@ -33,9 +33,9 @@ export interface Order
   total: number;
   status: string;
   payment: TypeResponseMidtrans;
-  createdBy: Types.ObjectId | string;
-  events: Types.ObjectId | string;
-  ticket: Types.ObjectId | string;
+  createdBy: ObjectId | string;
+  events: ObjectId | string;
+  ticket: ObjectId | string;
   orderId: string;
   quantity: number;
   vouchers: TypeVoucher[];
@@ -61,8 +61,16 @@ const OrderSchema = new Schema<Order>(
       required: true,
     },
     payment: {
-      token: { type: String, required: true },
-      redirect_url: { type: String, required: true },
+      type: {
+        token: {
+          type: Schema.Types.String,
+          required: true,
+        },
+        redirect_url: {
+          type: Schema.Types.String,
+          required: true,
+        },
+      },
     },
     status: {
       type: Schema.Types.String,
@@ -96,6 +104,17 @@ const OrderSchema = new Schema<Order>(
     timestamps: true,
   }
 ).index({ orderId: "text" });
+
+OrderSchema.pre("save", async function () {
+  const order = this;
+  order.orderId = getId();
+  order.payment = await payment.createLink({
+    transaction_details: {
+      gross_amount: order.total,
+      order_id: order.orderId,
+    },
+  });
+});
 
 const OrderModel = mongoose.model(ORDER_MODEL_NAME, OrderSchema);
 
