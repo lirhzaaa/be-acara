@@ -37,12 +37,18 @@ async create(req: IReqUser, res: Response) {
       orderId: getId(),
     };
 
+    console.log("payload:", finalPayload);
+
     const result = await OrderModel.create(finalPayload as any);
+    
+    console.log("success", result);
+    
     response.success(res, result, "Success to create an order");
   } catch (error) {
+    console.error("error", error);
     response.error(res, error, "Failed to create an order");
   }
-},
+},  
 
   // async findAll(req: IReqUser, res: Response) {
   //   try {
