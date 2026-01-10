@@ -61,16 +61,8 @@ const OrderSchema = new Schema<Order>(
       required: true,
     },
     payment: {
-      type: {
-        token: {
-          type: Schema.Types.String,
-          required: true,
-        },
-        redirect_url: {
-          type: Schema.Types.String,
-          required: true,
-        },
-      },
+      token: { type: String, required: true },
+      redirect_url: { type: String, required: true },
     },
     status: {
       type: Schema.Types.String,
@@ -104,29 +96,6 @@ const OrderSchema = new Schema<Order>(
     timestamps: true,
   }
 ).index({ orderId: "text" });
-
-OrderSchema.pre("save", async function () {
-  const order = this as any;
-
-  if (!order.total) {
-    throw new Error("Total belum ada");
-  }
-
-  order.orderId = getId();
-
-  const paymentResult = await payment.createLink({
-    transaction_details: {
-      gross_amount: order.total,
-      order_id: order.orderId,
-    },
-  });
-
-  if (!paymentResult?.token || !paymentResult?.redirect_url) {
-    throw new Error("Payment response invalid");
-  }
-
-  order.payment = paymentResult;
-});
 
 const OrderModel = mongoose.model(ORDER_MODEL_NAME, OrderSchema);
 
