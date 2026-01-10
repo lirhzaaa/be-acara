@@ -15,24 +15,32 @@ export type TypeResponseMidtrans = {
 
 export default {
   async createLink(payload: Payment): Promise<TypeResponseMidtrans> {
-    const result = await axios.post<TypeResponseMidtrans>(
-      `${MIDTRANS_TRANSACTION_URL}`,
-      payload,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          Authorization: `Basic ${Buffer.from(
-            `${MIDTRANS_SERVER_KEY}:`
-          ).toString("base64")}`,
-        },
-      }
-    );
-    
-    if (result.status !== 201) {
-      throw new Error("Payment failed");
-    }
+    try {
+      console.log("🔵 Calling Midtrans API...");
+      console.log("URL:", MIDTRANS_TRANSACTION_URL);
+      console.log("Payload:", payload);
 
-    return result?.data;
+      const result = await axios.post<TypeResponseMidtrans>(
+        `${MIDTRANS_TRANSACTION_URL}`,
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Basic ${Buffer.from(
+              `${MIDTRANS_SERVER_KEY}:`
+            ).toString("base64")}`,
+          },
+        }
+      );
+
+      console.log("Midtrans Response:", result.data);
+      return result?.data;
+    } catch (error: any) {
+      console.error("Midtrans Error:", error.response?.data || error.message);
+      throw new Error(
+        `Payment failed: ${error.response?.data?.message || error.message}`
+      );
+    }
   },
 };
