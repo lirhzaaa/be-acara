@@ -93,15 +93,19 @@ const EventSchema = new Schema<Event>(
       type: {
         region: {
           type: Schema.Types.Number,
+          required: true,
         },
         coordinates: {
           type: [Schema.Types.Number],
           default: [0, 0],
+          required: true,
         },
         address: {
           type: Schema.Types.String,
+          required: true,
         },
       },
+      required: true,
     },
   },
   {
