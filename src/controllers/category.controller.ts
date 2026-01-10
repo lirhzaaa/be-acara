@@ -3,17 +3,41 @@ import { IPaginationQuery, IReqUser } from "../utils/interfaces";
 import CategoryModel, { categoryDAO } from "../models/categoryModels";
 import response from "../utils/response";
 import { isValidObjectId } from "mongoose";
+import OrderModel, { orderDAO } from "../models/orderModels";
+import TicketModel from "../models/ticketModels";
+import { getId } from "../utils/id";
 
 export default {
-  async create(req: IReqUser, res: Response) {
-    try {
-      await categoryDAO.validate(req.body);
-      const result = await CategoryModel.create(req.body);
-      response.success(res, result, "Success create category");
-    } catch (error) {
-      response.error(res, error, "Failed create category");
+async create(req: IReqUser, res: Response) {
+  try {
+    const userId = req.user?.id;
+    
+    await orderDAO.validate(req.body);
+
+    const ticket = await TicketModel.findById(req.body.ticket);
+
+    if (!ticket) return response.notFound(res, "Ticket Not Found");
+    if (ticket.quantity < req.body.quantity) {
+      return response.error(res, null, "Ticket quantity is not enough");
     }
-  },
+    
+    const total: number = +ticket?.price * +req.body.quantity;
+
+    const payload = {
+      events: req.body.events,
+      ticket: req.body.ticket,
+      quantity: req.body.quantity,
+      total,
+      createdBy: userId,
+      orderId: getId(),
+    };
+
+    const result = await OrderModel.create(payload as any);
+    response.success(res, result, "Success to create an order");
+  } catch (error) {
+    response.error(res, error, "Failed to create an order");
+  }
+},
   async findAll(req: IReqUser, res: Response) {
     const {
       page = 1,
