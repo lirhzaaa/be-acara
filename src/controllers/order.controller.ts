@@ -9,51 +9,35 @@ import OrderModel, {
 } from "../models/orderModels";
 import TicketModel from "../models/ticketModels";
 import { getId } from "../utils/id";
-import payment from "../utils/payment";
 
 export default {
-async create(req: IReqUser, res: Response) {
-  try {
-    const userId = req.user?.id;
+  async create(req: IReqUser, res: Response) {
+    try {
+      const userId = req.user?.id;
+      const payload = {
+        ...req.body,
+        createdBy: userId,
+      } as TypeOrder;
 
-    const payload = {
-      ...req.body,
-      createdBy: userId,
-    } as TypeOrder;
+      await orderDAO.validate(payload);
+      const ticket = await TicketModel.findById(payload.ticket);
+      if (!ticket) return response.notFound(res, "Ticket Not Found");
+      if (ticket.quantity < payload.quantity) {
+        return response.error(res, null, "Ticket quantity is not enough");
+      }
+      const total: number = +ticket?.price * +payload.quantity;
 
-    await orderDAO.validate(payload);
+      Object.assign(payload, {
+        ...payload,
+        total,
+      });
 
-    const ticket = await TicketModel.findById(payload.ticket);
-    if (!ticket) return response.notFound(res, "Ticket Not Found");
-
-    if (ticket.quantity < payload.quantity) {
-      return response.error(res, null, "Ticket quantity is not enough");
+      const result = await OrderModel.create(payload);
+      response.success(res, result, "Success to create an order");
+    } catch (error) {
+      response.error(res, error, "Failed to create an order");
     }
-
-    const total = +ticket.price * +payload.quantity;
-    const orderId = getId();
-
-    // ✅ PAYMENT DI CONTROLLER (INI KUNCI)
-    const paymentResult = await payment.createLink({
-      transaction_details: {
-        gross_amount: total,
-        order_id: orderId,
-      },
-    });
-
-    const result = await OrderModel.create({
-      ...payload,
-      total,
-      orderId,
-      payment: paymentResult,
-    });
-
-    response.success(res, result, "Success to create an order");
-  } catch (error) {
-    response.error(res, error, "Failed to create an order");
-  }
-},
-
+  },
 
   async findAll(req: IReqUser, res: Response) {
     try {
