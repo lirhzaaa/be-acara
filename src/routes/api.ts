@@ -19,23 +19,24 @@ router.post("/auth/login", authController.login);
 router.get("/auth/me", authMiddleware, authController.me);
 router.post("/auth/activation", authController.activationCode);
 
-// router.post(
-//   "/orders",
-//   [authMiddleware, aclMiddleware([ROLES.MEMBER])],
-//   orderController.create
-//   /*
-//   #swagger.tags = ['Order']
-//   #swagger.security = [{
-//     "bearerAuth": ""
-//   }]
-//   #swagger.requestBody = {
-//     required: true,
-//     schema: {
-//       $ref: "#/components/schemas/CreateOrderRequest"
-//     }
-//   }
-//   */
-// );
+router.post(
+  "/orders",
+  [authMiddleware, aclMiddleware([ROLES.MEMBER])],
+  orderController.create
+  /*
+  #swagger.tags = ['Order']
+  #swagger.security = [{
+    "bearerAuth": ""
+  }]
+  #swagger.requestBody = {
+    required: true,
+    schema: {
+      $ref: "#/components/schemas/CreateOrderRequest"
+    }
+  }
+  */
+);
+
 // router.get(
 //   "/orders",
 //   [authMiddleware, aclMiddleware([ROLES.ADMIN])],
