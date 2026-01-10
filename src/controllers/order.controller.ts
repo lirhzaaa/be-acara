@@ -15,27 +15,29 @@ async create(req: IReqUser, res: Response) {
   try {
     const userId = req.user?.id;
     
-    await orderDAO.validate(req.body);
+    const payload = {
+      ...req.body,
+      createdBy: userId,
+    };
 
-    const ticket = await TicketModel.findById(req.body.ticket);
+    await orderDAO.validate(payload);
+
+    const ticket = await TicketModel.findById(payload.ticket);
 
     if (!ticket) return response.notFound(res, "Ticket Not Found");
-    if (ticket.quantity < req.body.quantity) {
+    if (ticket.quantity < payload.quantity) {
       return response.error(res, null, "Ticket quantity is not enough");
     }
     
-    const total: number = +ticket?.price * +req.body.quantity;
+    const total: number = +ticket?.price * +payload.quantity;
 
-    const payload = {
-      events: req.body.events,
-      ticket: req.body.ticket,
-      quantity: req.body.quantity,
+    const finalPayload = {
+      ...payload,
       total,
-      createdBy: userId,
-      orderId: getId(), // ← Generate di sini
+      orderId: getId(),
     };
 
-    const result = await OrderModel.create(payload as any);
+    const result = await OrderModel.create(finalPayload as any);
     response.success(res, result, "Success to create an order");
   } catch (error) {
     response.error(res, error, "Failed to create an order");
