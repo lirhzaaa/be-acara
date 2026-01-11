@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { IReqUser } from "../utils/interfaces";
-import EventModel, { Event, eventDAO, TypeEvent } from "../models/eventModels";
+import EventModel, { Event, eventDTO, TypeEvent } from "../models/eventModels";
 import response from "../utils/response";
 import { isValidObjectId, QueryFilter } from "mongoose";
 
@@ -8,7 +8,7 @@ export default {
   async create(req: IReqUser, res: Response) {
     try {
       const payload = { ...req.body, createdBy: req.user?.id } as Event;
-      await eventDAO.validate(payload);
+      await eventDTO.validate(payload);
       const result = await EventModel.create(payload);
       response.success(res, result, "Success to create an event");
     } catch (error) {
