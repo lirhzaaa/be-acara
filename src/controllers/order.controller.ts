@@ -172,4 +172,23 @@ export default {
       response.error(res, error, "Failed to cancelled an order");
     }
   },
+
+  async remove(req: IReqUser, res: Response) {
+    try {
+      const { orderId } = req.params;
+      const result = await OrderModel.findOneAndDelete(
+        {
+          orderId,
+        },
+        {
+          new: true,
+        }
+      );
+
+      if (!result) return response.notFound(res, "Order not found");
+      response.success(res, result, "Success remove an order");
+    } catch (error) {
+      response.error(res, error, "Failed to remove an order");
+    }
+  },
 };
