@@ -2,24 +2,63 @@ import mongoose from "mongoose";
 import { encrypt } from "../utils/encryption";
 import { sendEmail, renderMailHTML } from "../utils/mail/mail";
 import { ROLES } from "../utils/constant";
+import * as Yup from "yup";
 
-export const USER_MODEL_NAME = "User"
+const validatePassword = Yup.string()
+  .required()
+  .min(6, "Password must be at least 6 characters")
+  .test(
+    'at-least-one-uppercase-letter, "Contains at least one uppercase letter',
+    (value) => {
+      if (!value) return false;
+      const regex = /^(?=.*[A-Z])/;
+      return regex.test(value);
+    }
+  )
+  .test('at-least-one-number, "Contains at least one Number', (value) => {
+    if (!value) return false;
+    const regex = /^(?=.*\d)/;
+    return regex.test(value);
+  });
 
-export interface Users {
-  fullname: string;
-  username: string;
-  email: string;
-  password: string;
-  role: string;
-  profilePicture: string;
+const validateConfirmPassword = Yup.string()
+  .required()
+  .oneOf([Yup.ref("password"), ""], "Password not matched");
+
+export const USER_MODEL_NAME = "User";
+
+export const userLoginDTO = Yup.object({
+  identifier: Yup.string().required(),
+  password: validatePassword,
+});
+
+export const userUpdatePasswordDTO = Yup.object({
+  oldPassword: validatePassword,
+  password: validatePassword,
+  confirmPassword: validateConfirmPassword,
+});
+
+export const userDTO = Yup.object({
+  fullname: Yup.string().required(),
+  username: Yup.string().required(),
+  email: Yup.string().required(),
+  password: validatePassword,
+  confirmPassword: validateConfirmPassword,
+});
+
+export type TypeUser = Yup.InferType<typeof userDTO>
+
+export interface User extends Omit<TypeUser, "confirmPassword"> {
   isActive: boolean;
   activationCode: string;
   createdAt?: string;
+  role: string;
+  profilePicture: string;
 }
 
 const Schema = mongoose.Schema;
 
-const UsersSchema = new Schema<Users>(
+const UsersSchema = new Schema<User>(
   {
     fullname: {
       type: Schema.Types.String,
@@ -62,17 +101,17 @@ const UsersSchema = new Schema<Users>(
 );
 
 UsersSchema.pre("save", async function () {
-  this.password = encrypt(this.password);
-  this.activationCode = encrypt(this.id);
+  const user = this
+  user.password = encrypt(user.password);
+  user.activationCode = encrypt(user.id);
 });
 
 UsersSchema.post("save", async function (doc, next) {
   try {
     const user = doc;
-    console.log("Send Email To: ", user);
     const contentMail = await renderMailHTML("register-success.ejs", {
       username: user.username,
-      fullName: user.fullname,
+      fullname: user.fullname,
       email: user.email,
       createdAt: user.createdAt,
       activationLink: `${process.env.CLIENT_HOST}/auth/activation?code=${user.activationCode}`,

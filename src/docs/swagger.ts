@@ -29,7 +29,7 @@ const doc = {
         password: "azhrilnurmaulidan1234",
       },
       RegisterRequest: {
-        fullName: "lirhza lirhza",
+        fullname: "lirhza lirhza",
         username: "lirhza2025",
         email: "lirhza@yopmail.com",
         password: "12345678",
@@ -37,6 +37,15 @@ const doc = {
       },
       ActivationRequest: {
         code: "abcdef",
+      },
+      UpdateProfileRequest: {
+        fullname: "",
+        profilePicture: "",
+      },
+      UpdatePasswordRequest: {
+        oldPassword: "",
+        password: "",
+        confirmPassword: "",
       },
       CreateBannerRequest: {
         title: "banner title",
