@@ -96,7 +96,42 @@ export default {
     }
   },
 
-  async findAllMember(req: IReqUser, res: Response) {},
+  async findAllByMember(req: IReqUser, res: Response) {
+    try {
+      const userId = req.user?.id;
+      const buildQuery = (filter: any) => {
+        let query: Record<string, any> = { createdBy: userId };
+        if (filter.search) query.$text = { $search: filter.search };
+        return query;
+      };
+
+      const { limit = 10, page = 1, search } = req.query;
+
+      const query = buildQuery({
+        search,
+      });
+
+      const result = await OrderModel.find(query)
+        .limit(+limit)
+        .skip((+page - 1) * +limit)
+        .sort({ createdAt: -1 })
+        .exec();
+
+      const count = await OrderModel.countDocuments(query);
+      response.pagination(
+        res,
+        result,
+        {
+          current: +page,
+          total: count,
+          totalPages: Math.ceil(count / +limit),
+        },
+        "Success to find all by member an order"
+      );
+    } catch (error) {
+      response.error(res, error, "Failed find all by member an order");
+    }
+  },
 
   async completed(req: IReqUser, res: Response) {
     try {
@@ -214,7 +249,7 @@ export default {
     }
 
     if (order.status === OrderStatus.CANCELLED) {
-      return response.error(res, null, "you have been cancelled this order")
+      return response.error(res, null, "you have been cancelled this order");
     }
 
     const result = await OrderModel.findOneAndUpdate(
