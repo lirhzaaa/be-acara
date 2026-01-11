@@ -11,169 +11,165 @@ import TicketModel from "../models/ticketModels";
 import { getId } from "../utils/id";
 
 export default {
-async create(req: IReqUser, res: Response) {
-  try {
-    const userId = req.user?.id;
-    console.log("1️⃣ User ID:", userId);
-    
-    const payload = {
-      ...req.body,
-      createdBy: userId,
-    };
-    console.log("2️⃣ Payload:", payload);
+  async create(req: IReqUser, res: Response) {
+    try {
+      const userId = req.user?.id;
 
-    await orderDAO.validate(payload);
-    console.log("3️⃣ Validation passed");
+      const payload = {
+        ...req.body,
+        createdBy: userId,
+      };
 
-    const ticket = await TicketModel.findById(payload.ticket);
-    console.log("4️⃣ Ticket:", ticket);
+      await orderDAO.validate(payload);
 
-    if (!ticket) return response.notFound(res, "Ticket Not Found");
-    if (ticket.quantity < payload.quantity) {
-      return response.error(res, null, "Ticket quantity is not enough");
+      const ticket = await TicketModel.findById(payload.ticket);
+
+      if (!ticket) return response.notFound(res, "Ticket Not Found");
+      if (ticket.quantity < payload.quantity) {
+        return response.error(res, null, "Ticket quantity is not enough");
+      }
+
+      const total: number = +ticket?.price * +payload.quantity;
+
+      const finalPayload = {
+        ...payload,
+        total,
+        orderId: getId(),
+      };
+
+      const result = await OrderModel.create(finalPayload as any);
+      response.success(res, result, "Success to create an order");
+    } catch (error: any) {
+      response.error(res, error, "Failed to create an order");
     }
-    
-    const total: number = +ticket?.price * +payload.quantity;
-    console.log("5️⃣ Total:", total);
+  },
 
-    const finalPayload = {
-      ...payload,
-      total,
-      orderId: getId(),
-    };
-    console.log("6️⃣ Final Payload:", finalPayload);
+  async findAll(req: IReqUser, res: Response) {
+    try {
+      const buildQuery = (filter: any) => {
+        let query: Record<string, any> = {};
 
-    console.log("7️⃣ Creating order...");
-    const result = await OrderModel.create(finalPayload as any);
-    console.log("8️⃣ Success:", result);
-    
-    response.success(res, result, "Success to create an order");
-  } catch (error: any) {
-    console.error("❌ ERROR:", error);
-    console.error("❌ MESSAGE:", error.message);
-    response.error(res, error, "Failed to create an order");
-  }
-},  
+        if (filter.search) query.$text = { $search: filter.search };
 
-  // async findAll(req: IReqUser, res: Response) {
-  //   try {
-  //     const buildQuery = (filter: any) => {
-  //       let query: Record<string, any> = {};
+        return query;
+      };
 
-  //       if (filter.search) query.$text = { $search: filter.search };
+      const { limit = 10, page = 1, search } = req.query;
 
-  //       return query;
-  //     };
+      const query = buildQuery({
+        search,
+      });
 
-  //     const { limit = 10, page = 1, search } = req.query;
+      const result = await OrderModel.find(query)
+        .limit(+limit)
+        .skip((+page - 1) * +limit)
+        .sort({ createdAt: -1 })
+        .exec();
 
-  //     const query = buildQuery({
-  //       search,
-  //     });
+      const count = await OrderModel.countDocuments(query);
+      response.pagination(
+        res,
+        result,
+        {
+          current: +page,
+          total: count,
+          totalPages: Math.ceil(count / +limit),
+        },
+        "Success to find all an order"
+      );
+    } catch (error) {
+      response.error(res, error, "Failed to find all an order");
+    }
+  },
 
-  //     const result = await OrderModel.find(query)
-  //       .limit(+limit)
-  //       .skip((+page - 1) * +limit)
-  //       .sort({ createdAt: -1 })
-  //       .exec();
+  async findOne(req: IReqUser, res: Response) {
+    try {
+      const { orderId } = req.params;
+      const result = (await OrderModel.findOne({
+        orderId,
+      })) as any;
 
-  //     const count = await OrderModel.countDocuments(query);
-  //     response.pagination(
-  //       res,
-  //       result,
-  //       {
-  //         current: +page,
-  //         total: count,
-  //         totalPages: Math.ceil(count / +limit),
-  //       },
-  //       "Success to find all an order"
-  //     );
-  //   } catch (error) {
-  //     response.error(res, error, "Failed to find all an order");
-  //   }
-  // },
+      if (!result) return response.notFound(res, "Order Not Found");
+      response.success(res, result, "Success to find one an order");
+    } catch (error) {
+      response.error(res, error, "Failed to find one an order");
+    }
+  },
 
-  // async findOne(req: IReqUser, res: Response) {
-  //   try {
-  //     const { orderId } = req.params;
-  //     const result = await OrderModel.findOne({
-  //       orderId,
-  //     });
+  async findAllMember(req: IReqUser, res: Response) {},
 
-  //     if (!result) return response.notFound(res, "Order Not Found");
-  //     response.success(res, result, "Success to find one an order");
-  //   } catch (error) {
-  //     response.error(res, error, "Failed to find one an order");
-  //   }
-  // },
+  async completed(req: IReqUser, res: Response) {
+    try {
+      const { orderId } = req.params;
+      const userId = req.user?.id;
 
-  // async findAllMember(req: IReqUser, res: Response) {},
+      if (!userId) {
+        return response.error(res, null, "User not authenticated");
+      }
 
-  // async completed(req: IReqUser, res: Response) {
-  //   try {
-  //     const { orderId } = req.params;
-  //     const userId = req.user?.id;
+      const order = await OrderModel.findOne({
+        orderId,
+        createdBy: userId,
+      } as any);
 
-  //     const order = await OrderModel.findOne({
-  //       orderId,
-  //       createdBy: userId,
-  //     });
+      if (!order) return response.notFound(res, "Order Not Found");
+      if (order.status === OrderStatus.COMPLETED)
+        return response.error(res, null, "you have been completed this order");
 
-  //     if (!order) return response.notFound(res, "Order Not Found");
-  //     if (order.status === OrderStatus.COMPLETED)
-  //       return response.error(res, null, "you have been completed this order");
+      const vouchers: TypeVoucher[] = Array.from(
+        { length: order.quantity },
+        () => {
+          return {
+            isPrint: false,
+            voucherId: getId(),
+          } as TypeVoucher;
+        }
+      );
 
-  //     const vouchers: TypeVoucher[] = Array.from(
-  //       { length: order.quantity },
-  //       () => {
-  //         return {
-  //           isPrint: false,
-  //           voucherId: getId(),
-  //         } as TypeVoucher;
-  //       }
-  //     );
+      const result = await OrderModel.findOneAndUpdate(
+        {
+          orderId,
+          createdBy: userId,
+        } as any,
+        {
+          vouchers,
+          status: OrderStatus.COMPLETED,
+        },
+        {
+          new: true,
+        }
+      );
 
-  //     const result = await OrderModel.findOneAndUpdate(
-  //       {
-  //         orderId,
-  //         createdBy: userId,
-  //       },
-  //       {
-  //         vouchers,
-  //         status: OrderStatus.COMPLETED,
-  //       },
-  //       {
-  //         new: true,
-  //       }
-  //     );
+      const ticket = await TicketModel.findById(order.ticket);
 
-  //     const ticket = await TicketModel.findById(order.ticket)
+      if (!ticket) return response.notFound(res, "Ticket and Order Not Found");
 
-  //     if (!ticket) return response.notFound(res, "Ticket and Order Not Found")
-    
-  //       await TicketModel.updateOne({
-  //           _id: ticket._id
-  //       }, {
-  //           quantity: ticket.quantity - order.quantity
-  //       })
+      await TicketModel.updateOne(
+        {
+          _id: ticket._id,
+        },
+        {
+          quantity: ticket.quantity - order.quantity,
+        }
+      );
 
-  //     response.success(res, result, "Success to complete an order")
-  //   } catch (error) {
-  //     response.error(res, error, "Failed to completed an order");
-  //   }
-  // },
+      response.success(res, result, "Success to complete an order");
+    } catch (error) {
+      response.error(res, error, "Failed to completed an order");
+    }
+  },
 
-  // async pending(req: IReqUser, res: Response) {
-  //   try {
-  //   } catch (error) {
-  //     response.error(res, error, "Failed to pending an order");
-  //   }
-  // },
+  async pending(req: IReqUser, res: Response) {
+    try {
+    } catch (error) {
+      response.error(res, error, "Failed to pending an order");
+    }
+  },
 
-  // async cancelled(req: IReqUser, res: Response) {
-  //   try {
-  //   } catch (error) {
-  //     response.error(res, error, "Failed to cancelled an order");
-  //   }
-  // },
+  async cancelled(req: IReqUser, res: Response) {
+    try {
+    } catch (error) {
+      response.error(res, error, "Failed to cancelled an order");
+    }
+  },
 };

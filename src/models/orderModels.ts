@@ -65,11 +65,11 @@ const OrderSchema = new Schema<Order>(
       type: {
         token: {
           type: Schema.Types.String,
-          required: false,
+          required: true,
         },
         redirect_url: {
           type: Schema.Types.String,
-          required: false,
+          required: true,
         },
       },
     },
