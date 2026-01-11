@@ -109,6 +109,18 @@ router.delete(
   */
 );
 
+router.get(
+  "/orders-history",
+  [authMiddleware, aclMiddleware([ROLES.MEMBER])],
+  orderController.findAllByMember
+  /*
+  #swagger.tags = ['Order']
+  #swagger.security = [{
+    "bearerAuth": ""
+  }]
+  */
+);
+
 router.post(
   "/banners",
   [authMiddleware, aclMiddleware([ROLES.ADMIN])],
