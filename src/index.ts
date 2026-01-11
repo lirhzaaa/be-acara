@@ -7,6 +7,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import db from "./config/database";
 import docs from "./docs/route";
+import errorMiddleware from "./middleware/errorMiddleware";
 
 const app = express();
 const PORT = 3000;
@@ -27,6 +28,9 @@ async function init() {
     app.use(bodyParser.json());
     app.use("/api", router);
     docs(app);
+
+    app.use(errorMiddleware.serverRoute());
+    app.use(errorMiddleware.serverError());
 
     app.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);
