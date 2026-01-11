@@ -16,10 +16,6 @@ export type TypeResponseMidtrans = {
 export default {
   async createLink(payload: Payment): Promise<TypeResponseMidtrans> {
     try {
-      console.log("🔵 Calling Midtrans API...");
-      console.log("URL:", MIDTRANS_TRANSACTION_URL);
-      console.log("Payload:", payload);
-
       const result = await axios.post<TypeResponseMidtrans>(
         `${MIDTRANS_TRANSACTION_URL}`,
         payload,
@@ -34,7 +30,6 @@ export default {
         }
       );
 
-      console.log("Midtrans Response:", result.data);
       return result?.data;
     } catch (error: any) {
       console.error("Midtrans Error:", error.response?.data || error.message);
