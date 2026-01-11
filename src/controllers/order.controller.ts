@@ -103,9 +103,7 @@ export default {
       const { orderId } = req.params;
       const userId = req.user?.id;
 
-      if (!userId) {
-        return response.error(res, null, "User not authenticated");
-      }
+      if (!userId) response.notFound(res, "UserId not found");
 
       const order = await OrderModel.findOne({
         orderId,
@@ -161,12 +159,79 @@ export default {
 
   async pending(req: IReqUser, res: Response) {
     try {
+      const { orderId } = req.params;
+      const userId = req.user?.id;
+
+      if (!userId) response.notFound(res, "UserId not found");
+
+      const order = await OrderModel.findOne({
+        orderId,
+        createdBy: userId,
+      } as any);
+
+      if (!order) return response.notFound(res, "Order Not Found");
+      if (order.status === OrderStatus.COMPLETED) {
+        return response.error(res, null, "this order has been completed");
+      }
+
+      if (order.status === OrderStatus.PENDING) {
+        return response.error(res, null, "you have been pending this order");
+      }
+
+      const result = await OrderModel.findOneAndUpdate(
+        {
+          orderId,
+          createdBy: userId,
+        } as any,
+        {
+          status: OrderStatus.PENDING,
+        },
+        {
+          new: true,
+        }
+      );
+
+      response.success(res, result, "Success update to pending an order");
     } catch (error) {
       response.error(res, error, "Failed to pending an order");
     }
   },
 
   async cancelled(req: IReqUser, res: Response) {
+    const { orderId } = req.params;
+    const userId = req.params?.id;
+
+    if (!userId) response.notFound(res, "UserId not found");
+
+    const order = await OrderModel.findOne({
+      orderId,
+      createdBy: userId,
+    } as any);
+
+    if (!order) return response.notFound(res, "Order not found");
+    if (order.status === OrderStatus.COMPLETED) {
+      return response.error(res, null, "this order has been completed");
+    }
+
+    if (order.status === OrderStatus.CANCELLED) {
+      return response.error(res, null, "you have been cancelled this order")
+    }
+
+    const result = await OrderModel.findOneAndUpdate(
+      {
+        orderId,
+        createdBy: userId,
+      } as any,
+      {
+        status: OrderStatus.CANCELLED,
+      },
+      {
+        new: true,
+      }
+    );
+
+    response.success(res, result, "Success update to cancelled an order");
+
     try {
     } catch (error) {
       response.error(res, error, "Failed to cancelled an order");
