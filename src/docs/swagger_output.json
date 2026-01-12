@@ -442,7 +442,12 @@
           "default": {
             "description": ""
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": ""
+          }
+        ]
       }
     },
     "/banners": {

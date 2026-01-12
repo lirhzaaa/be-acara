@@ -207,6 +207,9 @@ router.get(
   orderController.findAllByMember
   /*
   #swagger.tags = ['Order']
+  #swagger.security = [{
+    "bearerAuth": ""
+  }]
   */
 );
 
