@@ -96,7 +96,7 @@ router.put(
   "/auth/update-password",
   authMiddleware,
   aclMiddleware([ROLES.MEMBER]),
-  authController.updatePassword
+  authController.updatePassword,
   /*
     #swagger.tags = ['Auth']
     #swagger.security = [{
@@ -203,13 +203,10 @@ router.delete(
 
 router.get(
   "/orders-history",
-  [authMiddleware, aclMiddleware([ROLES.MEMBER, ROLES.ADMIN])],
+  [authMiddleware, aclMiddleware([ROLES.MEMBER])],
   orderController.findAllByMember
   /*
   #swagger.tags = ['Order']
-  #swagger.security = [{
-    "bearerAuth": ""
-  }]
   */
 );
 
