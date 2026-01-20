@@ -114,7 +114,7 @@ UsersSchema.post("save", async function (doc, next) {
       fullname: user.fullname,
       email: user.email,
       createdAt: user.createdAt,
-      activationLink: `${process.env.CLIENT_HOST}/auth/activation?code=${user.activationCode}`,
+      activationLink: `${process.env.PRODUCTION_HOST}/auth/activation?code=${user.activationCode}`,
     });
 
     await sendEmail({

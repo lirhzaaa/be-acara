@@ -1,10 +1,10 @@
 import { Request } from "express";
 import { Types } from "mongoose";
-import { Users } from "../models/usersModels";
+import { User } from "../models/usersModels";
 
 export interface IUserToken
   extends Omit<
-    Users,
+    User,
     | "password"
     | "activationCode"
     | "isActive"

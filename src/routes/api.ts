@@ -592,7 +592,7 @@ router.post("/media/upload/multiple", [
                 type: "string",
                 format: "binary"
               }
-            }
+            } 
           }
         }
       }

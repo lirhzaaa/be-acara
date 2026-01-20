@@ -10,7 +10,7 @@ import docs from "./docs/route";
 import errorMiddleware from "./middleware/errorMiddleware";
 
 const app = express();
-const PORT = 3000;
+const PORT = 3000;  
 
 async function init() {
   try {
