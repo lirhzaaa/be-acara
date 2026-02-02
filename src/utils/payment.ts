@@ -6,6 +6,11 @@ export interface Payment {
     order_id: string;
     gross_amount: number;
   };
+  callbacks?: {
+    success_url: string;
+    pending_url: string;
+    error_url: string;
+  };
 }
 
 export type TypeResponseMidtrans = {

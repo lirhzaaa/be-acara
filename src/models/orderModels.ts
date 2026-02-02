@@ -113,6 +113,11 @@ OrderSchema.pre("save", async function () {
       gross_amount: order.total,
       order_id: order.orderId,
     },
+    callbacks: {
+      success_url: `https://fe-acara-tau.vercel.app/payment/success?order_id=${order.orderId}`,
+      pending_url: `https://fe-acara-tau.vercel.app/payment/pending?order_id=${order.orderId}`,
+      error_url: `https://fe-acara-tau.vercel.app/payment/error?order_id=${order.orderId}`,
+    },
   });
 });
 
