@@ -76,7 +76,7 @@ router.post(
 
 router.put("/auth/update-profile", [
   authMiddleware,
-  aclMiddleware([ROLES.MEMBER]),
+  aclMiddleware([ROLES.ADMIN, ROLES.MEMBER]),
   authController.updateProfile,
   /*
     #swagger.tags = ['Auth']
@@ -95,7 +95,7 @@ router.put("/auth/update-profile", [
 router.put(
   "/auth/update-password",
   authMiddleware,
-  aclMiddleware([ROLES.MEMBER]),
+  aclMiddleware([ROLES.ADMIN, ROLES.MEMBER]),
   authController.updatePassword,
   /*
     #swagger.tags = ['Auth']
